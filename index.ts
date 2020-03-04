@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer';
 (async () => {
   const browser = await puppeteer.launch({
     headless: false,
-    slowMo: 0,
+    slowMo: 0, //XXX 0だと勢いよくクロールしてしまうかも知れないので適当な値を入れたほうが良さそう(page.typeとか超遅くなるのでなんとかしたい)
   });
   const page = await browser.newPage();
 
