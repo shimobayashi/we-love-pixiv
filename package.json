@@ -1,0 +1,28 @@
+{
+  "name": "we-love-pixiv",
+  "version": "1.0.0",
+  "description": "We love pixiv so much.",
+  "main": "index.ts",
+  "dependencies": {
+    "puppeteer": "^2.1.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.7",
+    "@types/puppeteer": "^2.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/shimobayashi/we-love-pixiv.git"
+  },
+  "author": "shimobayashi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shimobayashi/we-love-pixiv/issues"
+  },
+  "homepage": "https://github.com/shimobayashi/we-love-pixiv#readme"
+}
