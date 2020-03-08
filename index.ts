@@ -7,7 +7,7 @@ import axios, { AxiosError } from 'axios';
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
   const browser = await puppeteer.launch({
-    headless: false, //XXX 後でtrueにする
+    headless: true,
     slowMo: 50,
   });
   const page = await browser.newPage();
@@ -28,7 +28,9 @@ import axios, { AxiosError } from 'axios';
   // なんかダイアログが出るので一応消しておく
   // 参考: https://qiita.com/shora_kujira16/items/34cb4074dfa715007698
   const xpath = `//button[text() = "わかった"]`;
-  await page.waitForXPath(xpath); //XXX そのうちこのダイアログが出なくなると永遠に待つことになりそうなので、なんかタイムアウトを設定したい
+  await page.waitForXPath(xpath, {
+    timeout: 3000,
+  });
   await (await page.$x(xpath))[0].click();
 
   /*
