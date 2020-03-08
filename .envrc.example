@@ -1,2 +1,3 @@
-PIXIV_USERNAME=username
-PIXIV_PASSWORD=password
+export PIXIV_USERNAME=username
+export PIXIV_PASSWORD=password
+export VIMAGEMORE_UPLOADER_URL=http://example.com/
