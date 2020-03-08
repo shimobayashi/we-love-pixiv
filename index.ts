@@ -58,6 +58,7 @@ import axios, { AxiosError } from 'axios';
   for (let url of figureUrls) {
     console.info('[Processing]', url);
     await page.goto(url);
+
     const imgSelector = 'div[role=presentation] a > img';
     await page.waitForSelector(imgSelector);
     const img = await page.$(imgSelector);
