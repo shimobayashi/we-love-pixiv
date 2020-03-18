@@ -69,11 +69,11 @@ if (!debugMode) {
     await page.goto(url);
 
     // イラストやうごイラが表示されているコンテナを取得する
-    const imgSelector = 'figure > div[role=presentation]';
-    await page.waitForSelector(imgSelector);
-    const img = await page.$(imgSelector);
-    if (!img) {
-      log_safe_content('img not found!');
+    const figureSelector = 'figure > div[role=presentation]';
+    await page.waitForSelector(figureSelector);
+    const figure = await page.$(figureSelector);
+    if (!figure) {
+      log_safe_content('figure not found!');
       continue;
     };
 
@@ -110,7 +110,7 @@ if (!debugMode) {
     };
     console.info('Title:', params.title);
     //console.info(params);
-    params.image = await img.screenshot({
+    params.image = await figure.screenshot({
       encoding: 'base64',
     });
     axios.post(process.env.VIMAGEMORE_UPLOADER_URL ?? '', params).then((ret) => {
