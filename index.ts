@@ -3,9 +3,21 @@
 import puppeteer from 'puppeteer';
 import axios, { AxiosError } from 'axios';
 
+// console.log系を生かしておくとミスってGitHub Actionsに意図しないログが大公開されてしまう可能性があるため、
+// 基本的にはconsole.log系は何もしないようにしておく。
+let log_safe_content = console.log; // 大丈夫そうなやつはこのメソッドを使ってロギングする
+if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
+  console.debug = function(){/* NOP */};
+  console.info = function(){/* NOP */};
+  console.log = function(){/* NOP */};
+  console.warn = function(){/* NOP */};
+  console.error = function(){/* NOP */};
+}
+
 // 参考: https://github.com/puppeteer/puppeteer/blob/master/docs/api.md
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
+  console.debug("Let's do this...");
   const browser = await puppeteer.launch({
     headless: true,
     slowMo: 50,
@@ -25,13 +37,7 @@ import axios, { AxiosError } from 'axios';
     password: process.env.PIXIV_PASSWORD ?? '',
   });
   page.click('#LoginComponent button[type=submit]');
-  // なんかダイアログが出るので一応消しておく
-  // 参考: https://qiita.com/shora_kujira16/items/34cb4074dfa715007698
-  const xpath = `//button[text() = "わかった"]`;
-  await page.waitForXPath(xpath, {
-    timeout: 3000,
-  });
-  await (await page.$x(xpath))[0].click();
+  await page.waitForNavigation();
 
   /*
    * フォロー新着作品の詳細ページURLを取得
@@ -59,7 +65,8 @@ import axios, { AxiosError } from 'axios';
     console.info('[Processing]', url);
     await page.goto(url);
 
-    const imgSelector = 'div[role=presentation] a > img';
+    // イラストやうごイラが表示されているコンテナを取得する
+    const imgSelector = 'figure > div[role=presentation]';
     await page.waitForSelector(imgSelector);
     const img = await page.$(imgSelector);
     if (!img) {
@@ -67,6 +74,7 @@ import axios, { AxiosError } from 'axios';
       continue;
     };
 
+    // ページタイトルから作品タイトルや著者名を取得する
     const result = (await page.title()).match(/^(#.+\s)?(.+)\s-\s(.+)の.+\s-\spixiv$/);
     if (!result) {
       console.error('failed to match title!');
@@ -75,6 +83,7 @@ import axios, { AxiosError } from 'axios';
     const illustTitle = result[2];
     const illustAuthor = result[3];
 
+    // 作品に付けられたタグを取得する
     const illustTags:Array<string> = [];
     {
       const tags = await page.$$('figcaption footer li');
@@ -88,6 +97,7 @@ import axios, { AxiosError } from 'axios';
       illustTags.unshift('R-00');
     }
 
+    // コンテナのスクショを撮ってアップロードする
     const params = {
       id: (url.match(/^https:\/\/www\.pixiv\.net\/artworks\/(\d+)/) ?? [])[1],
       title: `${illustTitle} - ${illustAuthor}`,
