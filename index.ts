@@ -6,7 +6,8 @@ import axios, { AxiosError } from 'axios';
 // console.log系を生かしておくとミスってGitHub Actionsに意図しないログが大公開されてしまう可能性があるため、
 // 基本的にはconsole.log系は何もしないようにしておく。
 let log_safe_content = console.log; // 大丈夫そうなやつはこのメソッドを使ってロギングする
-if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
+const debugMode:boolean = !!(process.env.DEBUG && process.env.DEBUG === '1'); // headlessもこれで制御しているので注意
+if (!debugMode) {
   console.debug = function(){/* NOP */};
   console.info = function(){/* NOP */};
   console.log = function(){/* NOP */};
@@ -17,9 +18,9 @@ if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
 // 参考: https://github.com/puppeteer/puppeteer/blob/master/docs/api.md
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
-  console.debug("Let's do this...");
+  log_safe_content("Let's do this...");
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: !debugMode,
     slowMo: 50,
   });
   const page = await browser.newPage();
@@ -56,13 +57,15 @@ if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
       figureUrls.push(figureUrl);
     }
   }
-  console.info('figureUrls:', figureUrls, figureUrls.length);
+  log_safe_content('figureUrls.length:', figureUrls.length);
+  console.info('figureUrls:', figureUrls);
 
   /*
    * 詳細ページURLからvimagemoreへ投稿 
    */
   for (let url of figureUrls) {
-    console.info('[Processing]', url);
+    log_safe_content('[Processing]');
+    console.info(url);
     await page.goto(url);
 
     // イラストやうごイラが表示されているコンテナを取得する
@@ -70,14 +73,14 @@ if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
     await page.waitForSelector(imgSelector);
     const img = await page.$(imgSelector);
     if (!img) {
-      console.error('img not found!');
+      log_safe_content('img not found!');
       continue;
     };
 
     // ページタイトルから作品タイトルや著者名を取得する
     const result = (await page.title()).match(/^(#.+\s)?(.+)\s-\s(.+)の.+\s-\spixiv$/);
     if (!result) {
-      console.error('failed to match title!');
+      log_safe_content('failed to match title!');
       continue;
     }
     const illustTitle = result[2];
@@ -111,10 +114,14 @@ if (!(process.env.DEBUG && process.env.DEBUG === '1')) {
       encoding: 'base64',
     });
     axios.post(process.env.VIMAGEMORE_UPLOADER_URL ?? '', params).then((ret) => {
-      console.info(`Success(${params.title}):`, ret.status);
+      log_safe_content('Success');
+      console.info(`${params.title}:`);
+      log_safe_content(ret.status);
     }).catch((error) => {
       // 重複したidを指定しているとエラーが返ってくるのでまあまあガンガンエラーが流れてくるはず
-      console.info(`Error(${params.title}):`, error.message);
+      log_safe_content('Error');
+      console.info(`${params.title}:`);
+      log_safe_content(error.message);
     })
   }
 
