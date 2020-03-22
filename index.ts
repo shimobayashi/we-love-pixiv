@@ -41,14 +41,19 @@ if (!debugMode) {
   await page.waitForNavigation();
 
   /*
-   * フォロー新着作品の詳細ページURLを取得
+   * フェッチ対象となる作品詳細URLを集める
    */
   const figureUrls:Array<string> = [];
-  for (let p = 1; p <= 2; p++) {
-    await page.goto(`https://www.pixiv.net/bookmark_new_illust.php?p=${p}`);
+  let pageUrls = [ // 対象とする作品が集まってるページURLを列挙する
+    'https://www.pixiv.net/bookmark_new_illust.php', // フォロー新着作品
+    'https://www.pixiv.net/discovery', // おすすめ作品
+  ];
+  // それぞれのページからfigure要素を抜き出して作品詳細URLを集める
+  for (let pageUrl of pageUrls) {
+    await page.goto(pageUrl);
 
     // 参考: https://qiita.com/go_sagawa/items/85f97deab7ccfdce53ea
-    const figures = await page.$$('#js-mount-point-latest-following figure');
+    const figures = await page.$$('figure');
     for (const figure of figures) {
       const li = await figure.$('figcaption li:nth-last-child(2) a'); // seriesの場合はliが3つになり、最初はseriesへのリンク
       if (!li) continue;
