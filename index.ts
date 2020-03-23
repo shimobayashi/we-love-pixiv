@@ -21,7 +21,7 @@ if (!debugMode) {
   log_safe_content("Let's do this...");
   const browser = await puppeteer.launch({
     headless: !debugMode,
-    slowMo: 50,
+    slowMo: debugMode ? 50 : 500, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
   });
   const page = await browser.newPage();
 
