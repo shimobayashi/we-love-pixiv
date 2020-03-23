@@ -74,6 +74,7 @@ if (!debugMode) {
     await page.goto(url);
 
     // イラストやうごイラが表示されているコンテナを取得する
+    log_safe_content('{Get figure}');
     const figureSelector = 'figure > div[role=presentation]';
     const figure = await page.waitForSelector(figureSelector, {timeout: 10000}).catch(error => {
       console.info(`${url}:`);
@@ -85,6 +86,7 @@ if (!debugMode) {
     };
 
     // ページタイトルから作品タイトルや著者名を取得する
+    log_safe_content('{Get illust title and author}');
     const result = (await page.title()).match(/^(#.+\s)?(.+)\s-\s(.+)の.+\s-\spixiv$/);
     if (!result) {
       log_safe_content('failed to match title!');
@@ -94,6 +96,7 @@ if (!debugMode) {
     const illustAuthor = result[3];
 
     // 作品に付けられたタグを取得する
+    log_safe_content('{Get tags}');
     const illustTags:Array<string> = [];
     {
       const tags = await page.$$('figcaption footer li');
@@ -107,7 +110,8 @@ if (!debugMode) {
       illustTags.unshift('R-00');
     }
 
-    // コンテナのスクショを撮ってアップロードする
+    // コンテナのスクショを撮る
+    log_safe_content('{Get screenshot}');
     const params = {
       id: (url.match(/^https:\/\/www\.pixiv\.net\/artworks\/(\d+)/) ?? [])[1],
       title: `${illustTitle} - ${illustAuthor}`,
@@ -120,6 +124,9 @@ if (!debugMode) {
     params.image = await figure.screenshot({
       encoding: 'base64',
     });
+
+    // 情報をまとめてアップロードする
+    log_safe_content('{Post to vimagemore}');
     axios.post(process.env.VIMAGEMORE_UPLOADER_URL ?? '', params).then((ret) => {
       log_safe_content('Success');
       console.info(`${params.title}:`);
