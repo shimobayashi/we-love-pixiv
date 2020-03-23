@@ -75,8 +75,10 @@ if (!debugMode) {
 
     // イラストやうごイラが表示されているコンテナを取得する
     const figureSelector = 'figure > div[role=presentation]';
-    await page.waitForSelector(figureSelector);
-    const figure = await page.$(figureSelector);
+    const figure = await page.waitForSelector(figureSelector, {timeout: 10000}).catch(error => {
+      console.info(`${url}:`);
+      log_safe_content(Error, error.message);
+    });
     if (!figure) {
       log_safe_content('figure not found!');
       continue;
