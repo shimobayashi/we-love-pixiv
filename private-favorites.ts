@@ -44,18 +44,41 @@ if (!debugMode) {
    * フォローを非公開にする
    */
   log_safe_content('Follows:');
-  await page.goto('https://www.pixiv.net/bookmark.php?type=user');
-  const checkBoxes = await page.$$('#search-result input');
-  for (let checkBox of checkBoxes) {
-      await checkBox.click();
+  {
+    while (1) {
+      await page.goto('https://www.pixiv.net/bookmark.php?type=user');
+      const checkBoxes = await page.$$('#search-result input');
+      log_safe_content('checkBoxes.length:', checkBoxes.length);
+      if (checkBoxes.length === 0) {
+          break;
+      }
+      for (let checkBox of checkBoxes) {
+        await checkBox.click();
+      }
+      await page.click(".control input[name='hide']");
+      await page.waitForNavigation();
+    }
   }
-  await page.click(".control input[name='hide']");
-  await page.waitForNavigation();
 
   /*
-   * お気に入りを非公開にする
+   * ブックマークを非公開にする
    */
-  //XXX
+  log_safe_content('Bookmarks:');
+  {
+    while (1) {
+      await page.goto('https://www.pixiv.net/bookmark.php');
+      const checkBoxes = await page.$$('#wrapper input[type=checkbox]');
+      log_safe_content('checkBoxes.length:', checkBoxes.length);
+      if (checkBoxes.length === 0) {
+          break;
+      }
+      for (let checkBox of checkBoxes) {
+          await checkBox.click();
+      }
+      await page.click('.buttons input[name=hide]');
+      await page.waitForNavigation();
+    }
+  }
 
-  //await browser.close();
+  await browser.close();
 })();
