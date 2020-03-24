@@ -1,4 +1,5 @@
-// usage: npx ts-node index.ts
+// pixivからもろもろのイラストを取得してアップロードするスクリプト
+// usage: npm run start
 
 import puppeteer from 'puppeteer';
 import axios, { AxiosError } from 'axios';
