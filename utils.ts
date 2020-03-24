@@ -13,7 +13,7 @@ if (!debugMode) {
 }
 
 // pixivにログイン済みのpageを返す
-export async function preparePixivLoginedBrowserAndPage() {
+export async function preparePixivLoginedBrowserAndPage(credential:{username:string, password:string}) {
   const browser = await puppeteer.launch({
     headless: !debugMode,
     slowMo: debugMode ? 50 : 500, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
@@ -28,10 +28,7 @@ export async function preparePixivLoginedBrowserAndPage() {
   await page.evaluate((credential) => {
     document.querySelector('#LoginComponent input[type=text]')?.setAttribute('value', credential.username);
     document.querySelector('#LoginComponent input[type=password]')?.setAttribute('value', credential.password);
-  }, {
-    username: process.env.PIXIV_USERNAME ?? '',
-    password: process.env.PIXIV_PASSWORD ?? '',
-  });
+  }, credential);
   page.click('#LoginComponent button[type=submit]');
   await page.waitForNavigation();
 
