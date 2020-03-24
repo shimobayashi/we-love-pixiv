@@ -27,3 +27,8 @@ jobs:
         PIXIV_PASSWORD: ${{ secrets.PIXIV_PASSWORD }}
         VIMAGEMORE_UPLOADER_URL: ${{ secrets.VIMAGEMORE_UPLOADER_URL }}
         CI: 1
+    - run: npm run start:private-favorites
+      env:
+        PIXIV_USERNAME: ${{ secrets.PIXIV_USERNAME }}
+        PIXIV_PASSWORD: ${{ secrets.PIXIV_PASSWORD }}
+        CI: 1
