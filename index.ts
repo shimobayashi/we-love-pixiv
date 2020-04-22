@@ -123,6 +123,8 @@ if (!debugMode) {
     //console.info(params);
     params.image = await figure.screenshot({
       encoding: 'base64',
+      type:     'jpeg',
+      quality:  60,
     });
 
     // 情報をまとめてアップロードする
