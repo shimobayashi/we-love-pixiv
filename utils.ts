@@ -16,7 +16,7 @@ if (!debugMode) {
 export async function preparePixivLoginedBrowserAndPage(credential:{username:string, password:string}) {
   const browser = await puppeteer.launch({
     headless: !debugMode,
-    slowMo: debugMode ? 50 : 500, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
+    slowMo: debugMode ? 50 : 100, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
   });
   const page = await browser.newPage();
 
