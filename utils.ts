@@ -24,12 +24,13 @@ export async function preparePixivLoginedBrowserAndPage(credential:{username:str
    * ログインする
    */
   await page.goto('https://accounts.pixiv.net/login');
+  await page.waitForSelector('#LoginComponent');
   // page.typeだとslowMoの分だけ待たされるので直接valueにぶち込む
   await page.evaluate((credential) => {
     document.querySelector('#LoginComponent input[type=text]')?.setAttribute('value', credential.username);
     document.querySelector('#LoginComponent input[type=password]')?.setAttribute('value', credential.password);
   }, credential);
-  page.click('#LoginComponent button[type=submit]');
+  await page.click('#LoginComponent button[type=submit]');
   await page.waitForNavigation();
 
   return {browser, page};
