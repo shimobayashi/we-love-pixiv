@@ -14,12 +14,32 @@ if (!debugMode) {
 }
 
 // pixivにログイン済みのpageを返す
+// ついでにタイムアウトしそうになったらスクショを取るように仕込んで、そのTimeoutオブジェクトも返す
 export async function preparePixivLoginedBrowserAndPage(credential:{username:string, password:string}) {
   const browser = await puppeteer.launch({
     headless: !debugMode,
     slowMo: debugMode ? 50 : 100, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
   });
   const page = await browser.newPage();
+
+  // GitHub Actionsでどこで詰まっているのか分からないので、
+  // タイムアウト直前っぽいタイミングでスクショを撮って送信してみる
+  const dyingMessageTimeout = setTimeout(async () => {
+    log_safe_content("Post dying message");
+    const now = (new Date()).toLocaleString('ja-JP');
+    const image = await page.screenshot({
+      encoding: 'base64',
+      type:     'jpeg',
+      quality:  60,
+    });
+    return postToVimagemore({
+      id: now,
+      title: `Dying message at ${now}`,
+      tags: ['DyingMessage', 'we-love-pixiv'],
+      link: 'https://github.com/shimobayashi/we-love-pixiv/actions',
+      image: image,
+    });
+  }, 5.9 * 60 * 60 * 1000);
 
   /*
    * ログインする
@@ -34,7 +54,7 @@ export async function preparePixivLoginedBrowserAndPage(credential:{username:str
   await page.click('#LoginComponent button[type=submit]');
   await page.waitForNavigation();
 
-  return {browser, page};
+  return {browser, page, dyingMessageTimeout};
 }
 
 interface Params {

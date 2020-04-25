@@ -7,30 +7,10 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
   log_safe_content("Let's do this...");
-  const {browser, page} = await preparePixivLoginedBrowserAndPage({
+  const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({
     username: process.env.PIXIV_USERNAME ?? '',
     password: process.env.PIXIV_PASSWORD ?? '',
   });
-
-  // GitHub Actionsでどこで詰まっているのか分からないので、
-  // タイムアウト直前っぽいタイミングでスクショを撮って送信してみる
-  const dyingMessageTimeout = setTimeout(async () => {
-    log_safe_content("Post dying message");
-    const now = (new Date()).toLocaleString('ja-JP');
-    const image = await page.screenshot({
-      encoding: 'base64',
-      type:     'jpeg',
-      quality:  60,
-    });
-    return postToVimagemore({
-      id: now,
-      title: `Dying message at ${now}`,
-      tags: ['DyingMessage', 'we-love-pixiv'],
-      link: 'https://github.com/shimobayashi/we-love-pixiv/actions',
-      image: image,
-    });
-  //}, 5.9 * 60 * 60 * 1000);
-  }, 1000);
 
   /*
    * フェッチ対象となる作品詳細URLを集める
