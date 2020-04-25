@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import axios from 'axios';
 
 // console.log系を生かしておくとミスってGitHub Actionsに意図しないログが大公開されてしまう可能性があるため、
 // 基本的にはconsole.log系は何もしないようにしておく。
@@ -34,4 +35,26 @@ export async function preparePixivLoginedBrowserAndPage(credential:{username:str
   await page.waitForNavigation();
 
   return {browser, page};
+}
+
+interface Params {
+  id: string;
+  title: string;
+  tags: string[];
+  link: string;
+  image: string;
+}
+export async function postToVimagemore(params:Params) {
+  // 情報をまとめてアップロードする
+  log_safe_content('{Post to vimagemore}');
+  return axios.post(process.env.VIMAGEMORE_UPLOADER_URL ?? '', params).then((ret) => {
+    log_safe_content('Success');
+    console.info(`${params.title}:`);
+    log_safe_content(ret.status);
+  }).catch((error) => {
+    // 重複したidを指定しているとエラーが返ってくるのでまあまあガンガンエラーが流れてくるはず
+    log_safe_content('Error');
+    console.info(`${params.title}:`);
+    log_safe_content(error.message);
+  })
 }

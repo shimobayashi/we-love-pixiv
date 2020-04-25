@@ -1,9 +1,7 @@
 // pixivからもろもろのイラストを取得してアップロードするスクリプト
 // usage: npm run start
 
-import axios from 'axios';
-
-import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage} from './utils'
+import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVimagemore} from './utils'
 
 // 参考: https://github.com/puppeteer/puppeteer/blob/master/docs/api.md
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
@@ -84,35 +82,22 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage} from './
       illustTags.unshift('R-00');
     }
 
-    // コンテナのスクショを撮る
+    // コンテナのスクショを撮ってアップロード
     log_safe_content('{Get screenshot}');
-    const params = {
-      id: (url.match(/^https:\/\/www\.pixiv\.net\/artworks\/(\d+)/) ?? [])[1],
-      title: `${illustTitle} - ${illustAuthor}`,
-      tags: illustTags,
-      link: url,
-      image: '',
-    };
-    console.info('Title:', params.title);
-    //console.info(params);
-    params.image = await figure.screenshot({
+    const title = `${illustTitle} - ${illustAuthor}`
+    console.info('Title:', title);
+    const image = await figure.screenshot({
       encoding: 'base64',
       type:     'jpeg',
       quality:  60,
     });
-
-    // 情報をまとめてアップロードする
-    log_safe_content('{Post to vimagemore}');
-    axios.post(process.env.VIMAGEMORE_UPLOADER_URL ?? '', params).then((ret) => {
-      log_safe_content('Success');
-      console.info(`${params.title}:`);
-      log_safe_content(ret.status);
-    }).catch((error) => {
-      // 重複したidを指定しているとエラーが返ってくるのでまあまあガンガンエラーが流れてくるはず
-      log_safe_content('Error');
-      console.info(`${params.title}:`);
-      log_safe_content(error.message);
-    })
+    postToVimagemore({
+      id: (url.match(/^https:\/\/www\.pixiv\.net\/artworks\/(\d+)/) ?? [])[1],
+      title: title,
+      tags: illustTags,
+      link: url,
+      image: image,
+    });
   }
 
   await browser.close();
