@@ -45,7 +45,8 @@ export async function preparePixivLoginedBrowserAndPage(credential:{username:str
    * ログインする
    */
   await page.goto('https://accounts.pixiv.net/login');
-  await page.waitForSelector('#LoginComponent');
+  await page.waitForSelector('#LoginComponent input[type=text]');
+  await page.waitForSelector('#LoginComponent input[type=password]');
   // page.typeだとslowMoの分だけ待たされるので直接valueにぶち込む
   await page.evaluate((credential) => {
     document.querySelector('#LoginComponent input[type=text]')?.setAttribute('value', credential.username);
