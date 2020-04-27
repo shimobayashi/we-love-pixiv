@@ -23,6 +23,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
   // それぞれのページからfigure要素を抜き出して作品詳細URLを集める
   for (let pageUrl of pageUrls) {
     await page.goto(pageUrl);
+    await page.waitForSelector('figure figcaption li:nth-last-child(2) a'); // なんかタイミングによってはDOMが生成されてない気がするので適当に待ってみる
 
     // 参考: https://qiita.com/go_sagawa/items/85f97deab7ccfdce53ea
     const figures = await page.$$('figure');
