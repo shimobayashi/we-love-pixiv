@@ -7,6 +7,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
   log_safe_content("Let's do this...");
+  const uploadTargetTags:string[]|undefined = process.env.UPLOAD_TARGET_TAGS?.split(',');
   const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({
     username: process.env.PIXIV_USERNAME ?? '',
     password: process.env.PIXIV_PASSWORD ?? '',
@@ -81,6 +82,12 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
     // R-18タグなどが含まれなければ検索性のためにR-00タグを付与する
     if (!(illustTags.some(tag => /^R-18G?$/.test(tag)))) {
       illustTags.unshift('R-00');
+    }
+
+    // アップロード対象タグが定義されていて、アップロード対象タグを含んでいなければスキップする
+    if (uploadTargetTags && !(uploadTargetTags.some(targetTag => illustTags.includes(targetTag)))) {
+      log_safe_content('skip: one of uploadTargetTags is not included');
+      continue;
     }
 
     // コンテナのスクショを撮ってアップロード
