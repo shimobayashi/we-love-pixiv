@@ -45,7 +45,6 @@ export async function preparePixivLoginedBrowserAndPage({credential, phpsessid}:
   /*
    * ログインする
    */
-  console.log(phpsessid);
   if (phpsessid) {
     await page.setCookie({name: 'PHPSESSID', value: phpsessid, domain: '.pixiv.net', httpOnly: true, secure: true, session: false});
     console.log(await page.cookies());
