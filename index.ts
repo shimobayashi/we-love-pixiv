@@ -13,6 +13,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
   /*
    * フェッチ対象となる作品詳細URLを集める
    */
+  log_safe_content("{Collect targets}");
   const figureUrls:Array<string> = [];
   let pageUrls = [ // 対象とする作品が集まってるページURLを列挙する
     'https://www.pixiv.net/bookmark_new_illust.php', // フォロー新着作品
@@ -107,4 +108,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
 
   clearTimeout(dyingMessageTimeout);
   await browser.close();
-})();
+})().catch(error => {
+  log_safe_content(error);
+  process.exit(1);
+});

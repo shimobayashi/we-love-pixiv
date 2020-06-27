@@ -42,17 +42,13 @@ export async function preparePixivLoginedBrowserAndPage({credential, phpsessid}:
     });
   }, 5.9 * 60 * 60 * 1000);
 
-  // チュートリアルバルーンみたいなのが邪魔なので表示されないようにしておく
-  await page.goto('https://accounts.pixiv.net/login'); // pixiv.netに移動してないとlocalStorageに触れないので移動
-  await page.evaluate(() => {
-    localStorage.setItem('showOnce', '{"previewModal":true}');
-  });
-
   /*
    * ログインする
    */
+  console.log(phpsessid);
   if (phpsessid) {
-    await page.setCookie({name: 'PHPSESSID', value: phpsessid});
+    await page.setCookie({name: 'PHPSESSID', value: phpsessid, domain: '.pixiv.net', httpOnly: true, secure: true, session: false});
+    console.log(await page.cookies());
   } else if (credential) {
     await page.goto('https://accounts.pixiv.net/login');
     await page.waitForSelector('#LoginComponent input[type=text]');
@@ -67,6 +63,12 @@ export async function preparePixivLoginedBrowserAndPage({credential, phpsessid}:
   } else {
     throw "phpsessid or credential is needed.";
   }
+
+  // チュートリアルバルーンみたいなのが邪魔なので表示されないようにしておく
+  await page.goto('https://www.pixiv.net/'); // www.pixiv.netに移動してないとlocalStorageに触れないので移動
+  await page.evaluate(() => {
+    localStorage.setItem('showOnce', '{"previewModal":true}');
+  });
 
   return {browser, page, dyingMessageTimeout};
 }
