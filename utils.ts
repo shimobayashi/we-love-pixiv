@@ -42,6 +42,11 @@ export async function preparePixivLoginedBrowserAndPage({credential, phpsessid}:
     });
   }, 5.9 * 60 * 60 * 1000);
 
+  // チュートリアルバルーンみたいなのが邪魔なので表示されないようにしておく
+  await page.evaluate(() => {
+    localStorage.setItem('showOnce', '{"previewModal":true}');
+  });
+
   /*
    * ログインする
    */
