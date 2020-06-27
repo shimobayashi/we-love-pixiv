@@ -8,10 +8,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage, postToVi
 (async () => {
   log_safe_content("Let's do this...");
   const uploadTargetTags:string[]|undefined = process.env.UPLOAD_TARGET_TAGS?.split(',');
-  const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({
-    username: process.env.PIXIV_USERNAME ?? '',
-    password: process.env.PIXIV_PASSWORD ?? '',
-  });
+  const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({phpsessid: process.env.PHPSESSID});
 
   /*
    * フェッチ対象となる作品詳細URLを集める

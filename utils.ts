@@ -14,8 +14,9 @@ if (!debugMode) {
 }
 
 // pixivにログイン済みのpageを返す
+// PHPSESSIDか認証情報のどちらかを渡す必要がある。が、認証情報を渡してもreCAPTCHAは突破できないのであまり意味はない
 // ついでにタイムアウトしそうになったらスクショを取るように仕込んで、そのTimeoutオブジェクトも返す
-export async function preparePixivLoginedBrowserAndPage(credential:{username:string, password:string}) {
+export async function preparePixivLoginedBrowserAndPage({credential, phpsessid}:{credential?:{username:string, password:string}, phpsessid?:string}) {
   const browser = await puppeteer.launch({
     headless: !debugMode,
     slowMo: debugMode ? 50 : 100, // 人間が目で見てるわけでなさそうだったらなるべくサーバーをいたわる気持ちで動きを遅くしておく
@@ -44,16 +45,22 @@ export async function preparePixivLoginedBrowserAndPage(credential:{username:str
   /*
    * ログインする
    */
-  await page.goto('https://accounts.pixiv.net/login');
-  await page.waitForSelector('#LoginComponent input[type=text]');
-  await page.waitForSelector('#LoginComponent input[type=password]');
-  // page.typeだとslowMoの分だけ待たされるので直接valueにぶち込む
-  await page.evaluate((credential) => {
-    document.querySelector('#LoginComponent input[type=text]')?.setAttribute('value', credential.username);
-    document.querySelector('#LoginComponent input[type=password]')?.setAttribute('value', credential.password);
-  }, credential);
-  await page.click('#LoginComponent button[type=submit]');
-  await page.waitForNavigation();
+  if (phpsessid) {
+    await page.setCookie({name: 'PHPSESSID', value: phpsessid});
+  } if (credential) {
+    await page.goto('https://accounts.pixiv.net/login');
+    await page.waitForSelector('#LoginComponent input[type=text]');
+    await page.waitForSelector('#LoginComponent input[type=password]');
+    // page.typeだとslowMoの分だけ待たされるので直接valueにぶち込む
+    await page.evaluate((credential) => {
+      document.querySelector('#LoginComponent input[type=text]')?.setAttribute('value', credential.username);
+      document.querySelector('#LoginComponent input[type=password]')?.setAttribute('value', credential.password);
+    }, credential);
+    await page.click('#LoginComponent button[type=submit]');
+    await page.waitForNavigation();
+  } else {
+    throw "phpsessid or credential is needed.";
+  }
 
   return {browser, page, dyingMessageTimeout};
 }

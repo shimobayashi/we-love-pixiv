@@ -7,10 +7,7 @@ import {log_safe_content, debugMode, preparePixivLoginedBrowserAndPage} from './
 // 参考: https://qiita.com/rh_taro/items/32bb6851303cbc613124
 (async () => {
   log_safe_content("Let's do this...");
-  const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({
-    username: process.env.PIXIV_USERNAME ?? '',
-    password: process.env.PIXIV_PASSWORD ?? '',
-  });
+  const {browser, page, dyingMessageTimeout} = await preparePixivLoginedBrowserAndPage({phpsessid: process.env.PHPSESSID});
 
   /*
    * フォローを非公開にする
