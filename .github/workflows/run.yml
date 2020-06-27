@@ -25,12 +25,10 @@ jobs:
       run: npm ci
     - run: npm run start
       env:
-        PIXIV_USERNAME: ${{ secrets.PIXIV_USERNAME }}
-        PIXIV_PASSWORD: ${{ secrets.PIXIV_PASSWORD }}
+        PHPSESSID: ${{ secrets.PHPSESSID }}
         VIMAGEMORE_UPLOADER_URL: ${{ secrets.VIMAGEMORE_UPLOADER_URL }}
         CI: 1
     - run: npm run start:private-favorites
       env:
-        PIXIV_USERNAME: ${{ secrets.PIXIV_USERNAME }}
-        PIXIV_PASSWORD: ${{ secrets.PIXIV_PASSWORD }}
+        PHPSESSID: ${{ secrets.PHPSESSID }}
         CI: 1
